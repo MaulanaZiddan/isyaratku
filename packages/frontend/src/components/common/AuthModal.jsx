@@ -24,6 +24,7 @@ const AuthModal = () => {
     switchMode,
     verificationMessage,
     clearVerificationMessage,
+    showAuthToast,
     loginWithEmail,
     loginWithGoogle,
     registerWithEmail,
@@ -139,9 +140,11 @@ const AuthModal = () => {
         }
         setIsSubmitted(true)
         clearVerificationMessage()
+        showAuthToast('Login berhasil! Selamat datang di Isyaratku.')
         setTimeout(() => {
           setIsSubmitted(false)
-          navigate('/app/kuis')
+          closeModal()
+          navigate('/app/kuis', { replace: true })
         }, 500)
       } else if (isRegister) {
         const { needsEmailConfirmation, error } = await registerWithEmail(
@@ -161,9 +164,11 @@ const AuthModal = () => {
         }
         setIsSubmitted(true)
         clearVerificationMessage()
+        showAuthToast('Pendaftaran berhasil! Selamat datang di Isyaratku.')
         setTimeout(() => {
           setIsSubmitted(false)
-          navigate('/app/kuis')
+          closeModal()
+          navigate('/app/kuis', { replace: true })
         }, 500)
       }
     } finally {

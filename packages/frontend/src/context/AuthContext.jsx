@@ -205,10 +205,6 @@ export const AuthProvider = ({ children }) => {
         role: 'Siswa Terdaftar',
       }
       setUser(fallback)
-      setIsOpen(false)
-      setAuthToast('Login berhasil! Selamat datang di Isyaratku.')
-      setTimeout(() => setAuthToast(''), 4500)
-      navigate('/app/kuis', { replace: true })
       return { user: fallback, error: null }
     }
 
@@ -230,10 +226,6 @@ export const AuthProvider = ({ children }) => {
       }
     }
 
-    setIsOpen(false)
-    setAuthToast('Login berhasil! Selamat datang di Isyaratku.')
-    setTimeout(() => setAuthToast(''), 4500)
-    navigate('/app/kuis', { replace: true })
     return { user: result, error: null }
   }
 
@@ -306,6 +298,11 @@ export const AuthProvider = ({ children }) => {
     const mapped = await fetchAndSetUser(data.user)
     setIsOpen(false)
     return { user: mapped, needsEmailConfirmation: false, error: null }
+  }
+
+  const showAuthToast = (message) => {
+    setAuthToast(message)
+    setTimeout(() => setAuthToast(''), 4500)
   }
 
   const updateProfile = async ({ firstName, lastName }) => {
@@ -512,6 +509,7 @@ export const AuthProvider = ({ children }) => {
         verificationMessage,
         clearVerificationMessage: () => setVerificationMessage(''),
         authToast,
+        showAuthToast,
         clearAuthToast: () => setAuthToast(''),
         login,
         loginWithEmail,
