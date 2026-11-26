@@ -228,6 +228,8 @@ export const AuthProvider = ({ children }) => {
     }
 
     setIsOpen(false)
+    setAuthToast('Login berhasil! Selamat datang di Isyaratku.')
+    setTimeout(() => setAuthToast(''), 4500)
     return { user: result, error: null }
   }
 
