@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuthModal } from '@/context/AuthContext'
 import { useUserTheme } from '@/hooks/useUserTheme'
+import ConfirmModal from '@/components/common/ConfirmModal'
 
 const navItems = [
   { to: '/app/kamus', label: 'Kamus', icon: BookOpen },
@@ -30,6 +31,8 @@ const UserPortalLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
   const [isHelpOpen, setIsHelpOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   // RBAC: Hanya role 'user' yang boleh mengakses Portal User
   if (!user) {
@@ -39,9 +42,12 @@ const UserPortalLayout = () => {
     return <Navigate to="/admin/dashboard" replace />
   }
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
+    await logout()
+    setIsLoggingOut(false)
+    setShowLogoutConfirm(false)
+    navigate('/', { replace: true })
   }
 
   return (
@@ -227,7 +233,7 @@ const UserPortalLayout = () => {
 
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)}
               className="bg-red-700 hover:bg-red-800 text-white px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm active:scale-[0.98]"
             >
               <LogOut className="w-4 h-4" />
@@ -329,6 +335,17 @@ const UserPortalLayout = () => {
             )
           })}
         </nav>
+        <ConfirmModal
+          isOpen={showLogoutConfirm}
+          title="Konfirmasi Keluar"
+          message="Apakah Anda yakin ingin keluar dari Portal Belajar?"
+          confirmLabel="Ya, Keluar"
+          cancelLabel="Batal"
+          variant="danger"
+          isLoading={isLoggingOut}
+          onConfirm={handleConfirmLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+        />
       </div>
     </div>
   )

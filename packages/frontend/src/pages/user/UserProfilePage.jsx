@@ -14,6 +14,7 @@ import {
   EyeOff,
 } from 'lucide-react'
 import { useAuthModal } from '@/context/AuthContext'
+import ConfirmModal from '@/components/common/ConfirmModal'
 
 const UserProfilePage = () => {
   const {
@@ -55,8 +56,10 @@ const UserProfilePage = () => {
     }
   }, [user])
 
+  const [confirmModal, setConfirmModal] = useState(null) // { type: 'profile' | 'password', title, message }
+
   useEffect(() => {
-    if (isOtpModalOpen) {
+    if (isOtpModalOpen || confirmModal) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -64,11 +67,22 @@ const UserProfilePage = () => {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [isOtpModalOpen])
+  }, [isOtpModalOpen, confirmModal])
 
-  const handleSave = async (e) => {
+  const handleSave = (e) => {
     e.preventDefault()
+    const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
+    setConfirmModal({
+      type: 'profile',
+      title: isEmailChanged ? 'Konfirmasi Perubahan Email & Profil' : 'Konfirmasi Simpan Profil',
+      message: isEmailChanged
+        ? `Apakah Anda yakin ingin menyimpan perubahan profil dan mengganti email ke ${email.trim()}?`
+        : 'Apakah Anda yakin ingin menyimpan perubahan nama profil Anda?',
+    })
+  }
 
+  const executeSaveProfile = async () => {
+    setConfirmModal(null)
     // Cek apakah user ingin mengubah email
     const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
 
@@ -144,7 +158,7 @@ const UserProfilePage = () => {
   }
 
   // Handle Ubah Kata Sandi langsung di profil
-  const handlePasswordChange = async (e) => {
+  const handlePasswordChange = (e) => {
     e.preventDefault()
     setPassError('')
     setPassSuccess(false)
@@ -162,6 +176,15 @@ const UserProfilePage = () => {
       return
     }
 
+    setConfirmModal({
+      type: 'password',
+      title: 'Konfirmasi Ubah Kata Sandi',
+      message: 'Apakah Anda yakin ingin memperbarui kata sandi akun Anda?',
+    })
+  }
+
+  const executePasswordChange = async () => {
+    setConfirmModal(null)
     setIsChangingPass(true)
     try {
       const { error } = await updatePassword(newPassword)
@@ -465,6 +488,22 @@ const UserProfilePage = () => {
           </div>,
           document.body
         )}
+
+      <ConfirmModal
+        isOpen={Boolean(confirmModal)}
+        title={confirmModal?.title}
+        message={confirmModal?.message}
+        confirmLabel="Ya, Simpan"
+        cancelLabel="Batal"
+        onConfirm={() => {
+          if (confirmModal?.type === 'profile') {
+            executeSaveProfile()
+          } else if (confirmModal?.type === 'password') {
+            executePasswordChange()
+          }
+        }}
+        onCancel={() => setConfirmModal(null)}
+      />
     </div>
   )
 }

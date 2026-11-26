@@ -15,6 +15,7 @@ import {
   UserCircle,
 } from 'lucide-react'
 import { useAdminAuth } from '@/context/AdminAuthContext'
+import ConfirmModal from '@/components/common/ConfirmModal'
 
 const adminNavItems = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -30,6 +31,8 @@ const AdminLayout = () => {
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   // Terapkan tema gelap / terang / sistem pada Admin Panel
   useEffect(() => {
@@ -64,10 +67,13 @@ const AdminLayout = () => {
     return <Navigate to="/admin/login" replace />
   }
 
-  const handleLogout = () => {
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
     document.documentElement.classList.remove('dark')
-    logoutAdmin()
-    navigate('/admin/login')
+    await logoutAdmin()
+    setIsLoggingOut(false)
+    setShowLogoutConfirm(false)
+    navigate('/admin/login', { replace: true })
   }
 
   return (
@@ -241,7 +247,7 @@ const AdminLayout = () => {
 
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)}
               className="bg-red-700 hover:bg-red-800 text-white px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm active:scale-[0.98]"
             >
               <LogOut className="w-4 h-4" />
@@ -255,6 +261,18 @@ const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
+
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        title="Konfirmasi Keluar Admin"
+        message="Apakah Anda yakin ingin keluar dari Panel Admin?"
+        confirmLabel="Ya, Keluar"
+        cancelLabel="Batal"
+        variant="danger"
+        isLoading={isLoggingOut}
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </div>
   )
 }

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useAdminAuth } from '@/context/AdminAuthContext'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import ConfirmModal from '@/components/common/ConfirmModal'
 
 const PREFS_KEY = 'isyaratku_admin_prefs'
 
@@ -62,6 +63,7 @@ const AdminSettingsPage = () => {
   const [language, setLanguage] = useState(initialPrefs.language || 'id')
   const [theme, setTheme] = useState(initialPrefs.theme || 'light')
   const [prefSavedMsg, setPrefSavedMsg] = useState('')
+  const [confirmModal, setConfirmModal] = useState(null) // { type: 'profile' | 'password', title, message }
 
   useEffect(() => {
     try {
@@ -139,12 +141,24 @@ const AdminSettingsPage = () => {
 
   const handleSaveProfile = (e) => {
     e.preventDefault()
-    updateAdmin({ name: fullName, username, email, phone })
+    const isEmailChanged = email.trim().toLowerCase() !== (admin?.email || '').trim().toLowerCase()
+    setConfirmModal({
+      type: 'profile',
+      title: isEmailChanged ? 'Konfirmasi Perubahan Profil & Email' : 'Konfirmasi Simpan Profil',
+      message: isEmailChanged
+        ? `Apakah Anda yakin ingin menyimpan perubahan profil dan mengganti email admin ke ${email.trim()}?`
+        : 'Apakah Anda yakin ingin menyimpan perubahan informasi profil admin?',
+    })
+  }
+
+  const executeSaveProfile = async () => {
+    setConfirmModal(null)
+    await updateAdmin({ name: fullName, username, email, phone })
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 2000)
   }
 
-  const handleChangePassword = async (e) => {
+  const handleChangePassword = (e) => {
     e.preventDefault()
     setPasswordError('')
     setPasswordSaved(false)
@@ -158,6 +172,15 @@ const AdminSettingsPage = () => {
       return
     }
 
+    setConfirmModal({
+      type: 'password',
+      title: 'Konfirmasi Ubah Kata Sandi Admin',
+      message: 'Apakah Anda yakin ingin memperbarui kata sandi akun administrator?',
+    })
+  }
+
+  const executeChangePassword = async () => {
+    setConfirmModal(null)
     setIsUpdatingPassword(true)
     const { success, error } = await updateAdminPassword(oldPassword, newPassword)
     setIsUpdatingPassword(false)
@@ -647,6 +670,22 @@ const AdminSettingsPage = () => {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={Boolean(confirmModal)}
+        title={confirmModal?.title}
+        message={confirmModal?.message}
+        confirmLabel="Ya, Simpan"
+        cancelLabel="Batal"
+        onConfirm={() => {
+          if (confirmModal?.type === 'profile') {
+            executeSaveProfile()
+          } else if (confirmModal?.type === 'password') {
+            executeChangePassword()
+          }
+        }}
+        onCancel={() => setConfirmModal(null)}
+      />
     </div>
   )
 }
