@@ -37,6 +37,8 @@ function mapProfileToUser(authUser, profile) {
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate()
+  const navigateRef = useRef(navigate)
+  navigateRef.current = navigate
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState('login') // 'login' | 'register'
   const [verificationMessage, setVerificationMessage] = useState('')
@@ -132,7 +134,7 @@ export const AuthProvider = ({ children }) => {
         setAuthToast('Login dengan akun Google berhasil! Selamat datang di Isyaratku.')
         setTimeout(() => setAuthToast(''), 4500)
         window.history.replaceState({}, '', '/app/kuis')
-        navigate('/app/kuis', { replace: true })
+        navigateRef.current('/app/kuis', { replace: true })
         return
       }
 
@@ -164,7 +166,7 @@ export const AuthProvider = ({ children }) => {
     })
 
     return () => subscription.unsubscribe()
-  }, [navigate])
+  }, [])
 
   useEffect(() => {
     if (user) {
@@ -487,10 +489,21 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = async () => {
+    handlingRedirectRef.current = false
     setUser(null)
     localStorage.removeItem('isyaratku_user')
+    sessionStorage.removeItem('isyaratku_oauth_intent')
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key)
+        }
+      })
+    } catch {
+      // ignore storage errors
+    }
     if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut().catch(() => {})
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
     }
   }
 

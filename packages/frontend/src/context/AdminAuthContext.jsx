@@ -98,8 +98,17 @@ export const AdminAuthProvider = ({ children }) => {
   const logoutAdmin = async () => {
     setAdmin(null)
     localStorage.removeItem('isyaratku_admin')
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key)
+        }
+      })
+    } catch {
+      // ignore storage errors
+    }
     if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut().catch(() => {})
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
     }
   }
 
