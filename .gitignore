@@ -6,4 +6,10 @@ packages/frontend/dist/
 .env.*.local
 .DS_Store
 Thumbs.db
+
+# Video sudah diunggah ke Supabase Storage
 Bahan_Video/
+
+# File pribadi non-aplikasi
+BUKTI PEMBAYARAN TA SKRIPSI.png
+TA-015 (Form Kelayakan Proposal TA_2022-033_FIXXX).pdf
