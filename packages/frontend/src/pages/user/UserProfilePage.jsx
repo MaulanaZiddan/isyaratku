@@ -32,6 +32,7 @@ const UserProfilePage = () => {
   const [confirmDialog, setConfirmDialog] = useState(null) // { type: 'profile' | 'password', title, message }
   const [isConfirmLoading, setIsConfirmLoading] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [profileError, setProfileError] = useState('')
 
   // State untuk modal OTP / Verifikasi Email
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false)
@@ -70,12 +71,17 @@ const UserProfilePage = () => {
   }, [isOtpModalOpen])
 
   const executeSaveProfile = async () => {
+    setProfileError('')
     // Cek apakah user ingin mengubah email
     const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
 
     if (isEmailChanged) {
       // Simpan perubahan nama terlebih dahulu
-      await updateProfile({ firstName, lastName })
+      const { error: nameErr } = await updateProfile({ firstName, lastName })
+      if (nameErr) {
+        setProfileError(nameErr)
+        return
+      }
 
       // Buka modal verifikasi OTP untuk email baru
       setPendingNewEmail(email.trim())
@@ -98,11 +104,11 @@ const UserProfilePage = () => {
     // Jika hanya mengubah nama
     const { error } = await updateProfile({ firstName, lastName })
     if (error) {
-      alert(`Gagal menyimpan profil: ${error}`)
+      setProfileError(error)
       return
     }
     setIsSaved(true)
-    setTimeout(() => setIsSaved(false), 2000)
+    setTimeout(() => setIsSaved(false), 2500)
   }
 
   const hasProfileChanged =
@@ -314,7 +320,11 @@ const UserProfilePage = () => {
               </div>
 
               <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                {isSaved ? (
+                {profileError ? (
+                  <span className="text-xs font-semibold text-rose-600 flex items-center justify-center sm:justify-start gap-1.5">
+                    <AlertCircle className="w-4 h-4 shrink-0" /> {profileError}
+                  </span>
+                ) : isSaved ? (
                   <span className="text-xs font-semibold text-emerald-600 flex items-center justify-center sm:justify-start gap-1.5">
                     <CheckCircle2 className="w-4 h-4 shrink-0" /> Perubahan berhasil disimpan!
                   </span>

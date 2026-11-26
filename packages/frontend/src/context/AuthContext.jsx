@@ -308,7 +308,7 @@ export const AuthProvider = ({ children }) => {
     return { user: mapped, needsEmailConfirmation: false, error: null }
   }
 
-  const updateProfile = async ({ firstName, lastName, newEmail }) => {
+  const updateProfile = async ({ firstName, lastName }) => {
     if (!user) return { error: 'Belum masuk' }
 
     const updated = {
@@ -319,15 +319,42 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (isSupabaseConfigured && supabase && user.id) {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          first_name: updated.firstName,
-          last_name: updated.lastName,
-        })
-        .eq('id', user.id)
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            first_name: updated.firstName,
+            last_name: updated.lastName,
+          })
+          .eq('id', user.id)
 
-      if (error) return { error: error.message }
+        if (error) {
+          const isNetworkErr = /failed to fetch|networkerror|load failed/i.test(error.message || '')
+          if (isNetworkErr) {
+            // Fallback: coba simpan ke user_metadata Auth jika endpoint REST terblokir
+            const { error: authErr } = await supabase.auth.updateUser({
+              data: {
+                first_name: updated.firstName,
+                last_name: updated.lastName,
+              },
+            })
+            if (authErr) {
+              return {
+                error:
+                  'Gagal terhubung ke server (Failed to fetch). Periksa koneksi internet Anda atau matikan AdBlocker/VPN lalu coba lagi.',
+              }
+            }
+          } else {
+            return { error: error.message }
+          }
+        }
+      } catch (err) {
+        return {
+          error: /failed to fetch|network/i.test(err?.message || '')
+            ? 'Gagal terhubung ke server. Periksa koneksi internet Anda dan coba lagi.'
+            : err?.message || 'Terjadi kesalahan saat menyimpan profil.',
+        }
+      }
     }
 
     setUser(updated)
