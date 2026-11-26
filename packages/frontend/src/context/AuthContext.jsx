@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 
 const AuthContext = createContext(null)
@@ -35,9 +36,12 @@ function mapProfileToUser(authUser, profile) {
 }
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState('login') // 'login' | 'register'
   const [verificationMessage, setVerificationMessage] = useState('')
+  const [authToast, setAuthToast] = useState('')
+  const handlingRedirectRef = useRef(false)
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('isyaratku_user')
@@ -76,23 +80,74 @@ export const AuthProvider = ({ children }) => {
     const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
     const isSignupVerified =
       params.get('verified') === 'true' || hashParams.get('type') === 'signup'
+    const oauthIntent =
+      params.get('auth_action') === 'google_register'
+        ? 'register'
+        : params.get('auth_action') === 'google_login'
+        ? 'login'
+        : sessionStorage.getItem('isyaratku_oauth_intent')
 
-    if (isSignupVerified) {
-      // Pastikan user diarahkan ke modal Login dengan notifikasi berhasil verifikasi
-      supabase.auth.signOut().finally(() => {
+    const handlePostAuthRedirect = async (session) => {
+      if (handlingRedirectRef.current) return
+
+      if (isSignupVerified) {
+        handlingRedirectRef.current = true
+        await supabase.auth.signOut()
         setUser(null)
         setVerificationMessage('Email berhasil diverifikasi! Silakan masuk menggunakan akun Anda.')
         setMode('login')
         setIsOpen(true)
-        window.history.replaceState({}, '', window.location.pathname)
-      })
-    } else {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          fetchAndSetUser(session.user)
+        window.history.replaceState({}, '', '/')
+        return
+      }
+
+      if (oauthIntent === 'register' && session?.user) {
+        handlingRedirectRef.current = true
+        sessionStorage.removeItem('isyaratku_oauth_intent')
+        await supabase.auth.signOut()
+        setUser(null)
+        setVerificationMessage(
+          'Pendaftaran dengan akun Google berhasil! Silakan masuk menggunakan akun Anda.'
+        )
+        setMode('login')
+        setIsOpen(true)
+        window.history.replaceState({}, '', '/')
+        return
+      }
+
+      if (oauthIntent === 'login' && session?.user) {
+        handlingRedirectRef.current = true
+        sessionStorage.removeItem('isyaratku_oauth_intent')
+        const res = await fetchAndSetUser(session.user)
+        if (res?.isAdminAccount) {
+          await supabase.auth.signOut()
+          setVerificationMessage(
+            'Akun Administrator hanya dapat masuk melalui Panel Admin (/admin/login).'
+          )
+          setMode('login')
+          setIsOpen(true)
+          window.history.replaceState({}, '', '/')
+          return
         }
-      })
+        setAuthToast('Login dengan akun Google berhasil! Selamat datang di Isyaratku.')
+        setTimeout(() => setAuthToast(''), 4500)
+        window.history.replaceState({}, '', '/app/kuis')
+        navigate('/app/kuis', { replace: true })
+        return
+      }
+
+      if (session?.user) {
+        await fetchAndSetUser(session.user)
+      }
     }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (isSignupVerified) {
+        handlePostAuthRedirect(session)
+      } else if (session) {
+        handlePostAuthRedirect(session)
+      }
+    })
 
     const {
       data: { subscription },
@@ -101,18 +156,15 @@ export const AuthProvider = ({ children }) => {
         setMode('forgot')
         setIsOpen(true)
       }
-      if (isSignupVerified && event === 'SIGNED_IN') {
-        return
-      }
-      if (session?.user) {
-        fetchAndSetUser(session.user)
-      } else {
+      if (event === 'SIGNED_IN' && session?.user) {
+        handlePostAuthRedirect(session)
+      } else if (event === 'SIGNED_OUT' && !handlingRedirectRef.current) {
         setUser(null)
       }
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [navigate])
 
   useEffect(() => {
     if (user) {
@@ -179,15 +231,18 @@ export const AuthProvider = ({ children }) => {
     return { user: result, error: null }
   }
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (intent = 'login') => {
     if (!isSupabaseConfigured || !supabase) {
       return { error: 'Supabase belum dikonfigurasi.' }
     }
 
+    sessionStorage.setItem('isyaratku_oauth_intent', intent)
+    const actionParam = intent === 'register' ? 'google_register' : 'google_login'
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/app/kuis`,
+        redirectTo: `${window.location.origin}/?auth_action=${actionParam}`,
         queryParams: {
           prompt: 'select_account',
         },
@@ -195,6 +250,7 @@ export const AuthProvider = ({ children }) => {
     })
 
     if (error) {
+      sessionStorage.removeItem('isyaratku_oauth_intent')
       return { error: error.message }
     }
 
@@ -421,6 +477,8 @@ export const AuthProvider = ({ children }) => {
         switchMode,
         verificationMessage,
         clearVerificationMessage: () => setVerificationMessage(''),
+        authToast,
+        clearAuthToast: () => setAuthToast(''),
         login,
         loginWithEmail,
         loginWithGoogle,

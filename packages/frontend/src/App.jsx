@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from '@/context/AuthContext'
+import { CheckCircle2, X } from 'lucide-react'
+import { AuthProvider, useAuthModal } from '@/context/AuthContext'
 import { AdminAuthProvider } from '@/context/AdminAuthContext'
 import { DictionaryProvider } from '@/context/DictionaryContext'
 import { QuizProvider } from '@/context/QuizContext'
@@ -24,6 +25,25 @@ import AdminKuisPage from '@/pages/admin/AdminKuisPage'
 import AdminAnalisisPage from '@/pages/admin/AdminAnalisisPage'
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage'
 
+const AuthToastBanner = () => {
+  const { authToast, clearAuthToast } = useAuthModal()
+  if (!authToast) return null
+
+  return (
+    <div className="fixed top-5 right-5 z-[9999] max-w-sm bg-emerald-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-3 duration-200">
+      <CheckCircle2 className="w-5 h-5 shrink-0" />
+      <p className="text-xs sm:text-sm font-semibold">{authToast}</p>
+      <button
+        type="button"
+        onClick={clearAuthToast}
+        className="p-1 rounded-lg hover:bg-emerald-700/70 transition-colors"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  )
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -31,6 +51,7 @@ function App() {
         <AdminAuthProvider>
           <DictionaryProvider>
             <QuizProvider>
+              <AuthToastBanner />
               <Routes>
                 {/* Public / Guest Routes */}
                 <Route element={<PublicLayout />}>

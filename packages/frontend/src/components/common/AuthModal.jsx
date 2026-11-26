@@ -94,7 +94,7 @@ const AuthModal = () => {
     setInfoMessage('')
     setIsLoading(true)
     try {
-      const { error } = await loginWithGoogle()
+      const { error } = await loginWithGoogle(isLogin ? 'login' : 'register')
       if (error) {
         setErrorMessage(
           error.includes('provider is not enabled')
