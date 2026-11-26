@@ -1,0 +1,10 @@
+{
+  "name": "isyaratku",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "dev": "npm -w packages/frontend run dev",
+    "build": "npm -w packages/frontend run build",
+    "preview": "npm -w packages/frontend run preview"
+  }
+}

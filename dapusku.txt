@@ -1,0 +1,29 @@
+Adewole, K. S., Salawu, E. O., & Jimoh, R. G. (2025). Sign language recognition using deep learning: Advancements and challenges. International Journal of Latest Technology in Engineering Management & Applied Science, 13(12). https://doi.org/10.51583/ijltemas.2024.131230
+
+Deleviar, R., Santoso, B., & Wijaya, A. (2025). Pengembangan website speech to video bahasa isyarat Indonesia (BISINDO) berbasis algoritma long short term memory. Infotek, 8(1). https://doi.org/10.29408/jit.v8i1.26117
+
+Farhana, N., Hidayat, T., & Pratama, R. (2025). BISINDO sign language interpreter system using YOLOv8 and CNN. bit-Tech, 8(1). https://doi.org/10.32877/bt.v8i1.2638
+
+Kautsar, M. A., Permana, I., & Wibowo, A. (2024). 1DCNNTrans: BISINDO sign language interpreters in improving the inclusiveness of public services (arXiv preprint). https://doi.org/10.48550/arxiv.2409.01975
+
+Kristian, I. M. A., Putra, I. G., & Wibawa, K. (2024). Implementation of SIBI sign language realtime detection program (case study at Sekolah Luar Biasa Negeri 1 Tabanan). Journal of Computer Networks, Architecture and High Performance Computing, 6(3). https://doi.org/10.47709/cnahpc.v6i3.4405
+
+Lestari, D. P., & Santoso, H. (2023). Implementasi Multimedia Development Life Cycle pada media pembelajaran interaktif. Jurnal Sistem Komputer dan Informatika (JSON), 4(3), 210–218. https://doi.org/10.30865/json.v4i3.3452
+
+Limantara, A. D., Cahyono, B., & Setyawan, A. (2024). SIBI alphabet detection system based on convolutional neural network (CNN) method as learning media. Internet of Things and Artificial Intelligence Journal, 4(1). https://doi.org/10.31763/iota.v4i1.716
+
+Ramineni, S., Kumar, A., & Gupta, S. (2024). AI-driven novel approach for enhancing e-commerce accessibility through sign language integration in web and mobile applications. 2024 IEEE 17th International Symposium on Embedded Multicore/Many-core Systems-on-Chip (MCSoC). IEEE. https://doi.org/10.1109/mcsoc64144.2024.00053
+
+Riskhan, M. F., Rahman, M., & Aziz, A. (2024). Convolutional neural network based Malaysian sign-language recognition web application (Preprints). https://doi.org/10.20944/preprints202405.1601.v1
+
+Saputra, R. A., Wibowo, T., & Nugroho, S. (2024). Recognizing Indonesian sign language (BISINDO) gesture in complex backgrounds. Indonesian Journal of Electrical Engineering and Computer Science, 36(3), 1583–1593. https://doi.org/10.11591/ijeecs.v36.i3.pp1583-1593
+
+Silalahi, M. R., Ginting, R., & Situmorang, Z. (2024). Aplikasi penerjemah bahasa isyarat BISINDO menggunakan metode YOLOv5 berbasis mobile. Jurnal Spektrum, 11(3). https://doi.org/10.24843/spektrum.2024.v11.i03.p2
+
+Sutjiadi, R. (2023). Android-based application for real-time Indonesian sign language recognition using convolutional neural network. TEM Journal, 12(3), 1692–1699. https://doi.org/10.18421/tem123-35
+
+World Health Organization. (2021). World report on hearing. World Health Organization. https://www.who.int/publications/i/item/world-report-on-hearing
+
+
+"ABSTRAK/GAMBARAN UMUM"
+Komunikasi merupakan kebutuhan dasar manusia, namun penyandang disabilitas rungu (tunarungu) di Indonesia masih menghadapi communication gap dengan masyarakat dengar karena minimnya pemahaman terhadap Bahasa Isyarat Indonesia (BISINDO). Penelitian ini bertujuan untuk merancang dan membangun aplikasi web edukasi interaktif "Teman Tuli" sebagai media pembelajaran mandiri BISINDO tingkat dasar yang mencakup materi abjad, angka, dan kata sapaan. Aplikasi ini dikembangkan berbasis Single Page Application (SPA) menggunakan framework ReactJS untuk memberikan pengalaman pengguna yang responsif tanpa full page reload. Metodologi pengembangan yang digunakan adalah Multimedia Development Life Cycle (MDLC) versi Luther-Sutopo, yang terdiri dari enam tahapan: Concept, Design, Material Collecting, Assembly, Testing, dan Distribution. Aset video peraga BISINDO diperoleh melalui kerja sama dengan komunitas Akar Tuli Malang untuk menjamin keaslian dan presisi gestur. Aplikasi ini dilengkapi dengan materi pembelajaran berbasis video serta fitur evaluasi kuis tergamifikasi. Pengujian fungsionalitas sistem dilakukan menggunakan metode Black Box Testing untuk memastikan seluruh fitur navigasi, pemutaran video, dan perhitungan skor berjalan sesuai dengan spesifikasi

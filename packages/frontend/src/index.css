@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-600/25 transition-all hover:bg-violet-700 hover:shadow-xl hover:shadow-violet-600/30 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-[0.98];
+  }
+}
+
+/* Dark mode support untuk Admin Panel */
+html.dark .admin-shell {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+html.dark .admin-shell aside,
+html.dark .admin-shell header,
+html.dark .admin-shell .bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.dark .admin-shell .bg-gray-50,
+html.dark .admin-shell .bg-gray-50\/40,
+html.dark .admin-shell .bg-gray-50\/50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .admin-shell .bg-gray-100 {
+  background-color: #334155 !important;
+}
+
+html.dark .admin-shell .text-gray-900,
+html.dark .admin-shell .text-gray-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .admin-shell .text-gray-700,
+html.dark .admin-shell .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .admin-shell .text-gray-500,
+html.dark .admin-shell .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .admin-shell .border-gray-100,
+html.dark .admin-shell .border-gray-200,
+html.dark .admin-shell .border-gray-50 {
+  border-color: #334155 !important;
+}
+
+html.dark .admin-shell input,
+html.dark .admin-shell select,
+html.dark .admin-shell textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* Dark mode support untuk Tampilan Guest & User */
+html.dark .user-theme-shell {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+html.dark .user-theme-shell header,
+html.dark .user-theme-shell aside,
+html.dark .user-theme-shell footer,
+html.dark .user-theme-shell nav.fixed,
+html.dark .user-theme-shell .bg-white,
+html.dark .user-theme-shell .bg-white\/95 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+html.dark .user-theme-shell .bg-gray-50,
+html.dark .user-theme-shell .bg-gray-50\/40,
+html.dark .user-theme-shell .bg-gray-50\/50,
+html.dark .user-theme-shell .bg-slate-50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .user-theme-shell .bg-gray-100 {
+  background-color: #334155 !important;
+}
+
+html.dark .user-theme-shell .text-gray-900,
+html.dark .user-theme-shell .text-gray-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .user-theme-shell .text-gray-700,
+html.dark .user-theme-shell .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .user-theme-shell .text-gray-500,
+html.dark .user-theme-shell .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .user-theme-shell .border-gray-100,
+html.dark .user-theme-shell .border-gray-200,
+html.dark .user-theme-shell .border-gray-50 {
+  border-color: #334155 !important;
+}
+
+html.dark .user-theme-shell input,
+html.dark .user-theme-shell select,
+html.dark .user-theme-shell textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
