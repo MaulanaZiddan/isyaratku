@@ -139,8 +139,15 @@ const AdminSettingsPage = () => {
     reader.readAsDataURL(file)
   }
 
+  const hasAdminProfileChanged =
+    fullName.trim() !== (admin?.name || '').trim() ||
+    username.trim() !== (admin?.username || '').trim() ||
+    email.trim().toLowerCase() !== (admin?.email || '').trim().toLowerCase() ||
+    phone.trim() !== (admin?.phone || '').trim()
+
   const handleSaveProfile = (e) => {
     e.preventDefault()
+    if (!hasAdminProfileChanged) return
     setConfirmDialog({
       type: 'profile',
       title: isEn ? 'Confirm Profile Update' : 'Konfirmasi Perubahan Profil Admin',
@@ -373,7 +380,8 @@ const AdminSettingsPage = () => {
                 <div className="flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-xl transition-colors shadow-sm"
+                    disabled={!hasAdminProfileChanged}
+                    className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl transition-colors shadow-sm"
                   >
                     Simpan Perubahan
                   </button>

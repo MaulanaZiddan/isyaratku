@@ -105,8 +105,14 @@ const UserProfilePage = () => {
     setTimeout(() => setIsSaved(false), 2000)
   }
 
+  const hasProfileChanged =
+    firstName.trim() !== (user?.firstName || '').trim() ||
+    lastName.trim() !== (user?.lastName || '').trim() ||
+    email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
+
   const handleSave = (e) => {
     e.preventDefault()
+    if (!hasProfileChanged) return
     const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
     setConfirmDialog({
       type: 'profile',
@@ -317,7 +323,8 @@ const UserProfilePage = () => {
                 )}
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-2.5 bg-black hover:bg-gray-800 text-white font-semibold text-sm rounded-xl transition-colors shadow-sm active:scale-[0.99]"
+                  disabled={!hasProfileChanged}
+                  className="w-full sm:w-auto px-6 py-2.5 bg-black hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl transition-colors shadow-sm active:scale-[0.99]"
                 >
                   Simpan Perubahan
                 </button>
