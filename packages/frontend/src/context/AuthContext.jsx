@@ -4,12 +4,20 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 const AuthContext = createContext(null)
 
 function mapProfileToUser(authUser, profile) {
+  const metaName = authUser?.user_metadata?.full_name || authUser?.user_metadata?.name || ''
+  const metaParts = metaName.trim().split(/\s+/).filter(Boolean)
+
   const firstName =
     profile?.first_name ||
     authUser?.user_metadata?.first_name ||
+    metaParts[0] ||
     authUser?.email?.split('@')[0] ||
     'Pengguna'
-  const lastName = profile?.last_name || authUser?.user_metadata?.last_name || ''
+  const lastName =
+    profile?.last_name ||
+    authUser?.user_metadata?.last_name ||
+    metaParts.slice(1).join(' ') ||
+    ''
   const fullName = profile?.full_name || `${firstName} ${lastName}`.trim()
 
   return {
@@ -22,13 +30,14 @@ function mapProfileToUser(authUser, profile) {
     dbRole: profile?.role || 'user',
     totalPoints: profile?.total_points ?? 0,
     streakDays: profile?.streak_days ?? 0,
-    avatarUrl: profile?.avatar_url || null,
+    avatarUrl: profile?.avatar_url || authUser?.user_metadata?.avatar_url || authUser?.user_metadata?.picture || null,
   }
 }
 
 export const AuthProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState('login') // 'login' | 'register'
+  const [verificationMessage, setVerificationMessage] = useState('')
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('isyaratku_user')
@@ -63,11 +72,27 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchAndSetUser(session.user)
-      }
-    })
+    const params = new URLSearchParams(window.location.search)
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const isSignupVerified =
+      params.get('verified') === 'true' || hashParams.get('type') === 'signup'
+
+    if (isSignupVerified) {
+      // Pastikan user diarahkan ke modal Login dengan notifikasi berhasil verifikasi
+      supabase.auth.signOut().finally(() => {
+        setUser(null)
+        setVerificationMessage('Email berhasil diverifikasi! Silakan masuk menggunakan akun Anda.')
+        setMode('login')
+        setIsOpen(true)
+        window.history.replaceState({}, '', window.location.pathname)
+      })
+    } else {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          fetchAndSetUser(session.user)
+        }
+      })
+    }
 
     const {
       data: { subscription },
@@ -75,6 +100,9 @@ export const AuthProvider = ({ children }) => {
       if (event === 'PASSWORD_RECOVERY') {
         setMode('forgot')
         setIsOpen(true)
+      }
+      if (isSignupVerified && event === 'SIGNED_IN') {
+        return
       }
       if (session?.user) {
         fetchAndSetUser(session.user)
@@ -151,6 +179,28 @@ export const AuthProvider = ({ children }) => {
     return { user: result, error: null }
   }
 
+  const loginWithGoogle = async () => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { error: 'Supabase belum dikonfigurasi.' }
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/app/kuis`,
+        queryParams: {
+          prompt: 'select_account',
+        },
+      },
+    })
+
+    if (error) {
+      return { error: error.message }
+    }
+
+    return { error: null }
+  }
+
   const registerWithEmail = async (fullName, email, password) => {
     const parts = fullName.trim().split(/\s+/)
     const firstName = parts[0] || email.split('@')[0]
@@ -173,6 +223,7 @@ export const AuthProvider = ({ children }) => {
       email: email.trim(),
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/?verified=true`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -368,8 +419,11 @@ export const AuthProvider = ({ children }) => {
         openForgotPassword,
         closeModal,
         switchMode,
+        verificationMessage,
+        clearVerificationMessage: () => setVerificationMessage(''),
         login,
         loginWithEmail,
+        loginWithGoogle,
         registerWithEmail,
         updateProfile,
         requestEmailChange,

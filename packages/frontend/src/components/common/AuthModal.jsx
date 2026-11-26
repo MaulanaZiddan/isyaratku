@@ -22,7 +22,10 @@ const AuthModal = () => {
     mode,
     closeModal,
     switchMode,
+    verificationMessage,
+    clearVerificationMessage,
     loginWithEmail,
+    loginWithGoogle,
     registerWithEmail,
     requestPasswordReset,
     resetPasswordWithOtp,
@@ -86,6 +89,26 @@ const AuthModal = () => {
   const isRegister = mode === 'register'
   const isForgot = mode === 'forgot'
 
+  const handleGoogleAuth = async () => {
+    setErrorMessage('')
+    setInfoMessage('')
+    setIsLoading(true)
+    try {
+      const { error } = await loginWithGoogle()
+      if (error) {
+        setErrorMessage(
+          error.includes('provider is not enabled')
+            ? 'Login Google belum diaktifkan di Supabase Dashboard (Authentication → Providers → Google).'
+            : error
+        )
+      }
+    } catch {
+      setErrorMessage('Gagal menghubungkan ke akun Google.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMessage('')
@@ -115,6 +138,7 @@ const AuthModal = () => {
           return
         }
         setIsSubmitted(true)
+        clearVerificationMessage()
         setTimeout(() => {
           setIsSubmitted(false)
           navigate('/app/kuis')
@@ -136,6 +160,7 @@ const AuthModal = () => {
           return
         }
         setIsSubmitted(true)
+        clearVerificationMessage()
         setTimeout(() => {
           setIsSubmitted(false)
           navigate('/app/kuis')
@@ -337,10 +362,10 @@ const AuthModal = () => {
           </div>
         )}
 
-        {infoMessage && (
+        {(infoMessage || verificationMessage) && (
           <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-2.5 text-emerald-700 text-xs font-medium">
             <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-emerald-500" />
-            <span>{infoMessage}</span>
+            <span>{infoMessage || verificationMessage}</span>
           </div>
         )}
 
@@ -664,8 +689,9 @@ const AuthModal = () => {
             {/* Google Login Button */}
             <button
               type="button"
-              onClick={handleSubmit}
-              className="w-full py-2.5 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2.5 shadow-sm"
+              onClick={handleGoogleAuth}
+              disabled={isLoading}
+              className="w-full py-2.5 px-4 bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-60 text-gray-700 font-medium text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2.5 shadow-sm"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
