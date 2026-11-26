@@ -28,6 +28,8 @@ const UserPortalLayout = () => {
   const { isDark, toggleTheme } = useUserTheme()
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isNotifOpen, setIsNotifOpen] = useState(false)
+  const [isHelpOpen, setIsHelpOpen] = useState(false)
 
   // RBAC: Hanya role 'user' yang boleh mengakses Portal User
   if (!user) {
@@ -159,15 +161,62 @@ const UserPortalLayout = () => {
             >
               {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
             </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsNotifOpen((prev) => !prev)}
+                className="relative p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
+                title="Notifikasi"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-violet-600 rounded-full" />
+              </button>
+              {isNotifOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-xl p-4 z-40">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-bold text-gray-900">Notifikasi Belajar</h4>
+                    <button
+                      type="button"
+                      onClick={() => setIsNotifOpen(false)}
+                      className="text-[11px] text-gray-400 hover:text-gray-600"
+                    >
+                      Tutup
+                    </button>
+                  </div>
+                  <div className="space-y-2 text-xs text-gray-600">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNotifOpen(false)
+                        navigate('/app/kuis')
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-gray-50 hover:bg-violet-50 transition-colors"
+                    >
+                      <p className="font-semibold text-gray-900">Lanjutkan Kuis BISINDO</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Raih skor minimal 75 untuk membuka level kuis berikutnya.
+                      </p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNotifOpen(false)
+                        navigate('/app/progres')
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-gray-50 hover:bg-violet-50 transition-colors"
+                    >
+                      <p className="font-semibold text-gray-900">Cek Progres & Pencapaian</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Lihat grafik aktivitas mingguan dan lencana pencapaian Anda.
+                      </p>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               type="button"
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
-              title="Notifikasi"
-            >
-              <Bell className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
+              onClick={() => setIsHelpOpen(true)}
               className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
               title="Pusat Bantuan"
             >
@@ -191,6 +240,68 @@ const UserPortalLayout = () => {
         <main className="flex-1 p-4 sm:p-6 lg:p-10 pb-24 lg:pb-10 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
+
+        {/* Modal Pusat Bantuan */}
+        {isHelpOpen && (
+          <div
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsHelpOpen(false)
+            }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Pusat Bantuan Isyaratku</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsHelpOpen(false)}
+                  className="p-1.5 rounded-full text-gray-400 hover:bg-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="space-y-3 text-xs sm:text-sm text-gray-600">
+                <div className="p-3 rounded-2xl bg-gray-50">
+                  <p className="font-bold text-gray-900">1. Kamus Digital (3 Bahasa)</p>
+                  <p className="mt-0.5">
+                    Pilih bahasa Indonesia, English, atau العربية untuk mencari kosakata BISINDO dan memutar video peragaannya.
+                  </p>
+                </div>
+                <div className="p-3 rounded-2xl bg-gray-50">
+                  <p className="font-bold text-gray-900">2. Kuis Bertahap (KKM 75)</p>
+                  <p className="mt-0.5">
+                    Selesaikan setiap level dengan nilai minimal 75 untuk membuka level berikutnya secara otomatis.
+                  </p>
+                </div>
+                <div className="p-3 rounded-2xl bg-gray-50">
+                  <p className="font-bold text-gray-900">3. Progres & Pencapaian</p>
+                  <p className="mt-0.5">
+                    Pantau aktivitas belajar mingguan dan buka seluruh lencana pencapaian Anda.
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsHelpOpen(false)
+                    navigate('/tutorial')
+                  }}
+                  className="px-4 py-2 text-xs font-semibold text-violet-600 hover:bg-violet-50 rounded-xl"
+                >
+                  Buka Halaman Tutorial
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsHelpOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold bg-violet-600 text-white rounded-xl hover:bg-violet-700"
+                >
+                  Mengerti
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Mobile Bottom Navigation */}
         <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_-6px_rgba(0,0,0,0.08)]">

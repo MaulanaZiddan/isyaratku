@@ -29,6 +29,7 @@ const AdminLayout = () => {
   const { admin, isAdminLoggedIn, logoutAdmin } = useAdminAuth()
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isNotifOpen, setIsNotifOpen] = useState(false)
 
   // Terapkan tema gelap / terang / sistem pada Admin Panel
   useEffect(() => {
@@ -174,15 +175,62 @@ const AdminLayout = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsNotifOpen((prev) => !prev)}
+                className="relative p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
+                title="Notifikasi"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-violet-600 rounded-full" />
+              </button>
+              {isNotifOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-xl p-4 z-40">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-bold text-gray-900">Notifikasi Admin</h4>
+                    <button
+                      type="button"
+                      onClick={() => setIsNotifOpen(false)}
+                      className="text-[11px] text-gray-400 hover:text-gray-600"
+                    >
+                      Tutup
+                    </button>
+                  </div>
+                  <div className="space-y-2 text-xs text-gray-600">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNotifOpen(false)
+                        navigate('/admin/analisis')
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-gray-50 hover:bg-violet-50 transition-colors"
+                    >
+                      <p className="font-semibold text-gray-900">Pantau Aktivitas Siswa</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Lihat statistik terbaru pengguna & hasil kuis di Analisis Pengguna.
+                      </p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNotifOpen(false)
+                        navigate('/admin/pengaturan')
+                      }}
+                      className="w-full text-left p-2.5 rounded-xl bg-gray-50 hover:bg-violet-50 transition-colors"
+                    >
+                      <p className="font-semibold text-gray-900">Pengaturan Sistem</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Atur tema gelap/terang, bahasa, dan kata sandi admin.
+                      </p>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               type="button"
-              className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
-              title="Notifikasi"
-            >
-              <Bell className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
+              onClick={() => navigate('/admin/pengaturan')}
               className="p-2 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
               title="Profil Admin"
             >
