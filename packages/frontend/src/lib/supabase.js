@@ -18,3 +18,21 @@ export const supabase = isSupabaseConfigured
       },
     })
   : null
+
+/**
+ * Mengonversi path video lokal (/videos/...) ke URL publik Supabase Storage
+ * jika Supabase telah dikonfigurasi.
+ */
+export const resolveVideoUrl = (url) => {
+  if (!url || typeof url !== 'string') return url
+  if (!url.startsWith('/videos/')) return url
+  if (!isSupabaseConfigured || !supabaseUrl) return url
+
+  const relPath = url
+    .slice('/videos/'.length)
+    .split('/')
+    .map((seg) => encodeURIComponent(decodeURIComponent(seg)))
+    .join('/')
+
+  return `${supabaseUrl.replace(/\/$/, '')}/storage/v1/object/public/vocabulary-videos/Bahan_Video/${relPath}`
+}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { Folder } from 'lucide-react'
 import { dictionaryCategories, allVocabularies } from '@/data/vocabularies'
-import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured, resolveVideoUrl } from '@/lib/supabase'
 
 const defaultIconNames = {
   aktivitas: 'Activity',
@@ -94,7 +94,7 @@ export const DictionaryProvider = ({ children }) => {
             description: v.description || '',
             descriptionEn: v.description_en || '',
             descriptionAr: v.description_ar || '',
-            videoUrl: v.video_url,
+            videoUrl: resolveVideoUrl(v.video_url),
             videoPath: v.video_path || null,
             status: v.status || 'Aktif',
             sortOrder: v.sort_order ?? index,

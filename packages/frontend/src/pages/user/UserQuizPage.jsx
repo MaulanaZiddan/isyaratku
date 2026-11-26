@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useQuiz } from '@/context/QuizContext'
+import { resolveVideoUrl } from '@/lib/supabase'
 import {
   Play,
   CheckCircle,
@@ -34,7 +35,7 @@ const initialLevels = [
       {
         question: 'Perhatikan video peragaan BISINDO berikut. Kata ganti orang apakah yang sedang diisyaratkan?',
         mediaType: 'video',
-        mediaUrl: '/videos/pronomina/aku.mp4',
+        mediaUrl: resolveVideoUrl('/videos/pronomina/aku.mp4'),
         options: ['Aku / Saya', 'Kamu', 'Mereka', 'Dia'],
         correctAnswer: 0,
         explanation: 'Gerakan jari telunjuk mengarah ke dada sendiri menunjukkan kata ganti orang pertama tunggal "Aku / Saya" dalam BISINDO.',
@@ -42,7 +43,7 @@ const initialLevels = [
       {
         question: 'Amati gerakan tangan pada video berikut. Isyarat tersebut berarti:',
         mediaType: 'video',
-        mediaUrl: '/videos/pronomina/kamu.mp4',
+        mediaUrl: resolveVideoUrl('/videos/pronomina/kamu.mp4'),
         options: ['Kamu', 'Aku', 'Kalian', 'Ibu'],
         correctAnswer: 0,
         explanation: 'Isyarat "Kamu" dilakukan dengan mengarahkan jari telunjuk lurus ke arah lawan bicara.',
@@ -64,7 +65,7 @@ const initialLevels = [
       {
         question: 'Perhatikan video isyarat anggota keluarga berikut. Kosakata apakah yang diperagakan?',
         mediaType: 'video',
-        mediaUrl: '/videos/Keluarga/kakek.mp4',
+        mediaUrl: resolveVideoUrl('/videos/Keluarga/kakek.mp4'),
         options: ['Adik Laki-laki', 'Kakek', 'Nenek', 'Anak'],
         correctAnswer: 1,
         explanation: 'Video tersebut memperagakan isyarat BISINDO untuk anggota keluarga "Kakek".',
@@ -72,7 +73,7 @@ const initialLevels = [
       {
         question: 'Isyarat untuk kata "Ibu" dalam BISINDO diperagakan pada video berikut. Di manakah posisi gerakan tangannya?',
         mediaType: 'video',
-        mediaUrl: '/videos/Keluarga/ibu.mp4',
+        mediaUrl: resolveVideoUrl('/videos/Keluarga/ibu.mp4'),
         options: ['Dahi', 'Dagu / Pipi bawah', 'Dada', 'Bahu'],
         correctAnswer: 1,
         explanation: 'Isyarat Ibu dilakukan di area dagu/pipi bagian bawah dengan gerakan lembut seperti pada video.',
@@ -80,7 +81,7 @@ const initialLevels = [
       {
         question: 'Amati video peragaan berikut. Isyarat apakah yang ditampilkan untuk anggota keluarga ini?',
         mediaType: 'video',
-        mediaUrl: '/videos/Keluarga/bapak.mp4',
+        mediaUrl: resolveVideoUrl('/videos/Keluarga/bapak.mp4'),
         options: ['Ayah / Bapak', 'Kakak Perempuan', 'Adik', 'Ibu'],
         correctAnswer: 0,
         explanation: 'Isyarat Ayah / Bapak dilakukan dengan gerakan di area dahi/wajah bagian atas seperti pada video.',

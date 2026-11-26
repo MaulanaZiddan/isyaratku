@@ -18,6 +18,7 @@ import {
   Palette,
 } from 'lucide-react'
 import { categoryTranslations, wordTranslations } from '@/data/translations'
+import { resolveVideoUrl } from '@/lib/supabase'
 
 const formatWordTitle = (filename) => {
   const name = filename.replace(/\.mp4$/i, '')
@@ -53,7 +54,9 @@ const buildWords = (folder, categoryTitle, files) =>
       categoryAr: catTrans.ar,
       folder,
       filename: file,
-      videoUrl: `/videos/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`,
+      videoUrl: resolveVideoUrl(
+        `/videos/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`
+      ),
       description: `Peragaan gestur BISINDO untuk kosakata "${word}" dalam kategori ${categoryTitle}. Perhatikan posisi tangan, arah gerakan, dan ekspresi wajah peraga.`,
       descriptionEn: `BISINDO sign language demonstration for "${trans.en}" in the ${catTrans.en} category. Pay close attention to hand shape, movement direction, and facial expression.`,
       descriptionAr: `عرض لغة الإشارة الإندونيسية (BISINDO) لكلمة "${trans.ar}" في فئة ${catTrans.ar}. انتبه جيدًا لوضعية اليد واتجاه الحركة وتعبيرات الوجه.`,
