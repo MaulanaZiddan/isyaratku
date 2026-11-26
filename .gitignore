@@ -6,3 +6,4 @@ packages/frontend/dist/
 .env.*.local
 .DS_Store
 Thumbs.db
+Bahan_Video/
