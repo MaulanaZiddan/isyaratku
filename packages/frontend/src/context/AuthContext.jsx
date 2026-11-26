@@ -206,6 +206,9 @@ export const AuthProvider = ({ children }) => {
       }
       setUser(fallback)
       setIsOpen(false)
+      setAuthToast('Login berhasil! Selamat datang di Isyaratku.')
+      setTimeout(() => setAuthToast(''), 4500)
+      navigate('/app/kuis', { replace: true })
       return { user: fallback, error: null }
     }
 
@@ -230,6 +233,7 @@ export const AuthProvider = ({ children }) => {
     setIsOpen(false)
     setAuthToast('Login berhasil! Selamat datang di Isyaratku.')
     setTimeout(() => setAuthToast(''), 4500)
+    navigate('/app/kuis', { replace: true })
     return { user: result, error: null }
   }
 
