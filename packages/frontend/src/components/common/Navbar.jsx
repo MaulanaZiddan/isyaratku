@@ -7,18 +7,10 @@ import ConfirmModal from '@/components/common/ConfirmModal'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const location = useLocation()
   const { openLogin, openRegister, isLoggedIn, logout, user } = useAuthModal()
   const { isDark, toggleTheme } = useUserTheme()
-
-  const handleConfirmLogout = async () => {
-    setIsLoggingOut(true)
-    await logout()
-    setIsLoggingOut(false)
-    setShowLogoutConfirm(false)
-  }
 
   const toggleMenu = () => setIsOpen((prev) => !prev)
 
@@ -93,7 +85,7 @@ const Navbar = () => {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => setShowLogoutConfirm(true)}
+                  onClick={() => setIsLogoutModalOpen(true)}
                   className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -200,7 +192,7 @@ const Navbar = () => {
                     type="button"
                     onClick={() => {
                       setIsOpen(false)
-                      setShowLogoutConfirm(true)
+                      setIsLogoutModalOpen(true)
                     }}
                     className="w-full px-3 py-2 text-center rounded-lg text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
                   >
@@ -236,15 +228,17 @@ const Navbar = () => {
         </div>
       )}
       <ConfirmModal
-        isOpen={showLogoutConfirm}
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={async () => {
+          setIsLogoutModalOpen(false)
+          await logout()
+        }}
         title="Konfirmasi Keluar"
-        message="Apakah Anda yakin ingin keluar dari akun Anda?"
-        confirmLabel="Ya, Keluar"
-        cancelLabel="Batal"
+        message="Apakah Anda yakin ingin keluar dari akun Isyaratku?"
+        confirmText="Ya, Keluar"
+        cancelText="Batal"
         variant="danger"
-        isLoading={isLoggingOut}
-        onConfirm={handleConfirmLogout}
-        onCancel={() => setShowLogoutConfirm(false)}
       />
     </header>
   )

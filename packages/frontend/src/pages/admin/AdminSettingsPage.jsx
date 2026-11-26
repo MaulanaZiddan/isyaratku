@@ -54,6 +54,7 @@ const AdminSettingsPage = () => {
   const [passwordSaved, setPasswordSaved] = useState(false)
   const [passwordError, setPasswordError] = useState('')
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState(null) // { type: 'profile' | 'password', title, message }
 
   // Preferences state (persisted)
   const initialPrefs = loadAdminPrefs()
@@ -63,7 +64,6 @@ const AdminSettingsPage = () => {
   const [language, setLanguage] = useState(initialPrefs.language || 'id')
   const [theme, setTheme] = useState(initialPrefs.theme || 'light')
   const [prefSavedMsg, setPrefSavedMsg] = useState('')
-  const [confirmModal, setConfirmModal] = useState(null) // { type: 'profile' | 'password', title, message }
 
   useEffect(() => {
     try {
@@ -141,18 +141,16 @@ const AdminSettingsPage = () => {
 
   const handleSaveProfile = (e) => {
     e.preventDefault()
-    const isEmailChanged = email.trim().toLowerCase() !== (admin?.email || '').trim().toLowerCase()
-    setConfirmModal({
+    setConfirmDialog({
       type: 'profile',
-      title: isEmailChanged ? 'Konfirmasi Perubahan Profil & Email' : 'Konfirmasi Simpan Profil',
-      message: isEmailChanged
-        ? `Apakah Anda yakin ingin menyimpan perubahan profil dan mengganti email admin ke ${email.trim()}?`
-        : 'Apakah Anda yakin ingin menyimpan perubahan informasi profil admin?',
+      title: isEn ? 'Confirm Profile Update' : 'Konfirmasi Perubahan Profil Admin',
+      message: isEn
+        ? 'Are you sure you want to save changes to your administrator name, username, email, or phone?'
+        : 'Apakah Anda yakin ingin menyimpan perubahan data profil administrator (nama, username, email, atau nomor telepon)?',
     })
   }
 
   const executeSaveProfile = async () => {
-    setConfirmModal(null)
     await updateAdmin({ name: fullName, username, email, phone })
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 2000)
@@ -172,15 +170,16 @@ const AdminSettingsPage = () => {
       return
     }
 
-    setConfirmModal({
+    setConfirmDialog({
       type: 'password',
-      title: 'Konfirmasi Ubah Kata Sandi Admin',
-      message: 'Apakah Anda yakin ingin memperbarui kata sandi akun administrator?',
+      title: isEn ? 'Confirm Password Change' : 'Konfirmasi Ubah Kata Sandi Admin',
+      message: isEn
+        ? 'Are you sure you want to update your administrator password?'
+        : 'Apakah Anda yakin ingin memperbarui kata sandi akun administrator?',
     })
   }
 
   const executeChangePassword = async () => {
-    setConfirmModal(null)
     setIsUpdatingPassword(true)
     const { success, error } = await updateAdminPassword(oldPassword, newPassword)
     setIsUpdatingPassword(false)
@@ -196,6 +195,17 @@ const AdminSettingsPage = () => {
     setNewPassword('')
     setConfirmPassword('')
     setTimeout(() => setPasswordSaved(false), 3000)
+  }
+
+  const handleConfirmDialogAction = async () => {
+    if (!confirmDialog) return
+    const type = confirmDialog.type
+    setConfirmDialog(null)
+    if (type === 'profile') {
+      await executeSaveProfile()
+    } else if (type === 'password') {
+      await executeChangePassword()
+    }
   }
 
   const isEn = language === 'en'
@@ -672,19 +682,14 @@ const AdminSettingsPage = () => {
       </div>
 
       <ConfirmModal
-        isOpen={Boolean(confirmModal)}
-        title={confirmModal?.title}
-        message={confirmModal?.message}
-        confirmLabel="Ya, Simpan"
-        cancelLabel="Batal"
-        onConfirm={() => {
-          if (confirmModal?.type === 'profile') {
-            executeSaveProfile()
-          } else if (confirmModal?.type === 'password') {
-            executeChangePassword()
-          }
-        }}
-        onCancel={() => setConfirmModal(null)}
+        isOpen={!!confirmDialog}
+        onClose={() => setConfirmDialog(null)}
+        onConfirm={handleConfirmDialogAction}
+        title={confirmDialog?.title}
+        message={confirmDialog?.message}
+        confirmText={isEn ? 'Yes, Save' : 'Ya, Simpan'}
+        cancelText={isEn ? 'Cancel' : 'Batal'}
+        isLoading={isUpdatingPassword}
       />
     </div>
   )

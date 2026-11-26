@@ -29,6 +29,8 @@ const UserProfilePage = () => {
   const [firstName, setFirstName] = useState(user?.firstName || 'Andi')
   const [lastName, setLastName] = useState(user?.lastName || 'Pratama')
   const [email, setEmail] = useState(user?.email || 'andi.pratama@email.com')
+  const [confirmDialog, setConfirmDialog] = useState(null) // { type: 'profile' | 'password', title, message }
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
 
   // State untuk modal OTP / Verifikasi Email
@@ -56,10 +58,8 @@ const UserProfilePage = () => {
     }
   }, [user])
 
-  const [confirmModal, setConfirmModal] = useState(null) // { type: 'profile' | 'password', title, message }
-
   useEffect(() => {
-    if (isOtpModalOpen || confirmModal) {
+    if (isOtpModalOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -67,22 +67,9 @@ const UserProfilePage = () => {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [isOtpModalOpen, confirmModal])
-
-  const handleSave = (e) => {
-    e.preventDefault()
-    const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
-    setConfirmModal({
-      type: 'profile',
-      title: isEmailChanged ? 'Konfirmasi Perubahan Email & Profil' : 'Konfirmasi Simpan Profil',
-      message: isEmailChanged
-        ? `Apakah Anda yakin ingin menyimpan perubahan profil dan mengganti email ke ${email.trim()}?`
-        : 'Apakah Anda yakin ingin menyimpan perubahan nama profil Anda?',
-    })
-  }
+  }, [isOtpModalOpen])
 
   const executeSaveProfile = async () => {
-    setConfirmModal(null)
     // Cek apakah user ingin mengubah email
     const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
 
@@ -116,6 +103,18 @@ const UserProfilePage = () => {
     }
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 2000)
+  }
+
+  const handleSave = (e) => {
+    e.preventDefault()
+    const isEmailChanged = email.trim().toLowerCase() !== (user?.email || '').trim().toLowerCase()
+    setConfirmDialog({
+      type: 'profile',
+      title: isEmailChanged ? 'Konfirmasi Perubahan Email & Profil' : 'Konfirmasi Simpan Profil',
+      message: isEmailChanged
+        ? `Apakah Anda yakin ingin mengubah email ke "${email.trim()}" dan menyimpan perubahan profil? Kode verifikasi OTP akan dikirim ke email baru.`
+        : `Apakah Anda yakin ingin menyimpan perubahan nama menjadi "${firstName} ${lastName}"?`,
+    })
   }
 
   const handleVerifyOtp = async (e) => {
@@ -157,6 +156,23 @@ const UserProfilePage = () => {
     }
   }
 
+  const executePasswordChange = async () => {
+    setIsChangingPass(true)
+    try {
+      const { error } = await updatePassword(newPassword)
+      if (error) {
+        setPassError(error)
+        return
+      }
+      setPassSuccess(true)
+      setNewPassword('')
+      setConfirmPassword('')
+      setTimeout(() => setPassSuccess(false), 3000)
+    } finally {
+      setIsChangingPass(false)
+    }
+  }
+
   // Handle Ubah Kata Sandi langsung di profil
   const handlePasswordChange = (e) => {
     e.preventDefault()
@@ -176,28 +192,26 @@ const UserProfilePage = () => {
       return
     }
 
-    setConfirmModal({
+    setConfirmDialog({
       type: 'password',
       title: 'Konfirmasi Ubah Kata Sandi',
       message: 'Apakah Anda yakin ingin memperbarui kata sandi akun Anda?',
     })
   }
 
-  const executePasswordChange = async () => {
-    setConfirmModal(null)
-    setIsChangingPass(true)
+  const handleConfirmDialogAction = async () => {
+    if (!confirmDialog) return
+    setIsConfirmLoading(true)
+    const currentType = confirmDialog.type
+    setConfirmDialog(null)
     try {
-      const { error } = await updatePassword(newPassword)
-      if (error) {
-        setPassError(error)
-        return
+      if (currentType === 'profile') {
+        await executeSaveProfile()
+      } else if (currentType === 'password') {
+        await executePasswordChange()
       }
-      setPassSuccess(true)
-      setNewPassword('')
-      setConfirmPassword('')
-      setTimeout(() => setPassSuccess(false), 3000)
     } finally {
-      setIsChangingPass(false)
+      setIsConfirmLoading(false)
     }
   }
 
@@ -490,19 +504,14 @@ const UserProfilePage = () => {
         )}
 
       <ConfirmModal
-        isOpen={Boolean(confirmModal)}
-        title={confirmModal?.title}
-        message={confirmModal?.message}
-        confirmLabel="Ya, Simpan"
-        cancelLabel="Batal"
-        onConfirm={() => {
-          if (confirmModal?.type === 'profile') {
-            executeSaveProfile()
-          } else if (confirmModal?.type === 'password') {
-            executePasswordChange()
-          }
-        }}
-        onCancel={() => setConfirmModal(null)}
+        isOpen={!!confirmDialog}
+        onClose={() => setConfirmDialog(null)}
+        onConfirm={handleConfirmDialogAction}
+        title={confirmDialog?.title}
+        message={confirmDialog?.message}
+        confirmText="Ya, Simpan"
+        cancelText="Batal"
+        isLoading={isConfirmLoading}
       />
     </div>
   )

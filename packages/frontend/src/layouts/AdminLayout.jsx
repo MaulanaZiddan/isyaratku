@@ -31,8 +31,7 @@ const AdminLayout = () => {
   const navigate = useNavigate()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   // Terapkan tema gelap / terang / sistem pada Admin Panel
   useEffect(() => {
@@ -68,11 +67,9 @@ const AdminLayout = () => {
   }
 
   const handleConfirmLogout = async () => {
-    setIsLoggingOut(true)
+    setIsLogoutModalOpen(false)
     document.documentElement.classList.remove('dark')
     await logoutAdmin()
-    setIsLoggingOut(false)
-    setShowLogoutConfirm(false)
     navigate('/admin/login', { replace: true })
   }
 
@@ -247,7 +244,7 @@ const AdminLayout = () => {
 
             <button
               type="button"
-              onClick={() => setShowLogoutConfirm(true)}
+              onClick={() => setIsLogoutModalOpen(true)}
               className="bg-red-700 hover:bg-red-800 text-white px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm active:scale-[0.98]"
             >
               <LogOut className="w-4 h-4" />
@@ -260,19 +257,19 @@ const AdminLayout = () => {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
-      </div>
 
-      <ConfirmModal
-        isOpen={showLogoutConfirm}
-        title="Konfirmasi Keluar Admin"
-        message="Apakah Anda yakin ingin keluar dari Panel Admin?"
-        confirmLabel="Ya, Keluar"
-        cancelLabel="Batal"
-        variant="danger"
-        isLoading={isLoggingOut}
-        onConfirm={handleConfirmLogout}
-        onCancel={() => setShowLogoutConfirm(false)}
-      />
+        {/* Modal Konfirmasi Keluar Admin */}
+        <ConfirmModal
+          isOpen={isLogoutModalOpen}
+          onClose={() => setIsLogoutModalOpen(false)}
+          onConfirm={handleConfirmLogout}
+          title="Konfirmasi Keluar Admin"
+          message="Apakah Anda yakin ingin keluar dari Panel Admin Isyaratku?"
+          confirmText="Ya, Keluar"
+          cancelText="Batal"
+          variant="danger"
+        />
+      </div>
     </div>
   )
 }

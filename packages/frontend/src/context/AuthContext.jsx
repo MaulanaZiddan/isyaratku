@@ -463,10 +463,11 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = async () => {
-    if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut()
-    }
     setUser(null)
+    localStorage.removeItem('isyaratku_user')
+    if (isSupabaseConfigured && supabase) {
+      await supabase.auth.signOut().catch(() => {})
+    }
   }
 
   return (

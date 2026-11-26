@@ -96,10 +96,11 @@ export const AdminAuthProvider = ({ children }) => {
   }
 
   const logoutAdmin = async () => {
-    if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut()
-    }
     setAdmin(null)
+    localStorage.removeItem('isyaratku_admin')
+    if (isSupabaseConfigured && supabase) {
+      await supabase.auth.signOut().catch(() => {})
+    }
   }
 
   const updateAdmin = async (data) => {
